@@ -4,7 +4,7 @@ from chat.utils import update_room, is_user_allowed_in_room, raise_not_authorize
 
 
 @frappe.whitelist(allow_guest=True)
-def send(content: str, user: str, room: str, email: str):
+def send(content: str, user: str, room: str, email: str,token:str=None):
     """Send the message via socketio
 
     Args:
@@ -12,8 +12,9 @@ def send(content: str, user: str, room: str, email: str):
         user (str): Sender's name.
         room (str): Room's name.
         email (str): Sender's email.
+        token (str, optional): Guest Sender's token. Defaults to None.
     """
-    if not is_user_allowed_in_room(room, email, user):
+    if not is_user_allowed_in_room(room, email, user, token):
         raise_not_authorized_error()
 
     new_message = frappe.get_doc(
@@ -57,14 +58,16 @@ def send(content: str, user: str, room: str, email: str):
 
 
 @frappe.whitelist(allow_guest=True)
-def get_all(room: str, email: str):
+def get_all(room: str, email: str,token:str=None):
     """Get all the messages of a particular room
 
     Args:
         room (str): Room's name.
+        email (str): Sender's email.
+        token (str, optional): Guest Sender's token. Defaults to None.
 
     """
-    if not is_user_allowed_in_room(room, email):
+    if not is_user_allowed_in_room(room, email, token=token):
         raise_not_authorized_error()
 
     return frappe.get_all(

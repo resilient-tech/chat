@@ -25,12 +25,13 @@ def generate_guest_room(email: str, full_name: str, message: str) -> Tuple[str, 
             "doctype": "Chat Profile",
             "email": email,
             "guest_name": full_name,
+            "token": frappe.generate_hash(),
         }
     ).insert(ignore_permissions=True)
     new_room = frappe.get_doc(
         {
             "doctype": "Chat Room",
-            "guest": email,
+            "guest": profile_doc.token,
             "room_name": full_name,
             "members": "Guest",
             "type": "Guest",
@@ -61,7 +62,7 @@ def generate_guest_room(email: str, full_name: str, message: str) -> Tuple[str, 
 
 @frappe.whitelist(allow_guest=True)
 @validate_room_kwargs
-def get_guest_room(*, email: str, full_name: str, message: str) -> Dict[str, str]:
+def get_guest_room(*, email: str, full_name: str, message: str,token: str=None) -> Dict[str, str]:
     """Validate and setup profile & room for the guest user
 
     Args:
@@ -69,12 +70,11 @@ def get_guest_room(*, email: str, full_name: str, message: str) -> Dict[str, str
         full_name (str): Full name of guest.
         message (str): Message to be dropped.
     """
-    if not frappe.db.exists("Chat Profile", email):
-        room, token = generate_guest_room(email, full_name, message)
-
+    if token and frappe.db.exists("Chat Profile", token):
+        room = frappe.db.get_value("Chat Room", {"guest": token}, "name")
     else:
-        room = frappe.db.get_value("Chat Room", {"guest": email}, "name")
-        token = frappe.db.get_value("Chat Profile", email, "token")
+        # Generate a new guest room and token
+        room, token = generate_guest_room(email, full_name, message)
 
     return {
         "guest_name": "Guest",

@@ -28,7 +28,7 @@ def validate_token(token: str):
         return [False, {}]
 
     room = frappe.db.get_value(
-        'Chat Room', {'guest': guest_user.email}, ['name'])
+        'Chat Room', {'guest': guest_user.name}, ['name'])
 
     guest_details = {
         'email': guest_user.email,
@@ -171,22 +171,24 @@ def get_room_detail(room):
     return room_detail
 
 
-def is_user_allowed_in_room(room, email, user=None):
+def is_user_allowed_in_room(room, email, user=None, token=None):
     """Check if user is allowed in rooms
 
     Args:
         room (str): Room's name_case
         email (str): User's email
         user (str, optional): User's name. Defaults to None.
+        token (str, optional): Guest token. Defaults to None.
 
     Returns:
         bool: Whether user is allowed or not
     """
+
     if user == 'Guest' and frappe.session.user != user:
         return False
 
     room_detail = get_room_detail(room)
-    if frappe.session.user == "Guest" and room_detail and room_detail.guest != email:
+    if frappe.session.user == "Guest" and room_detail and room_detail.guest != token:
         return False
 
     if frappe.session.user != "Guest" and room_detail and room_detail.type != 'Guest' and email not in room_detail.members:

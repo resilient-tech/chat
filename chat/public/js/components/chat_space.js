@@ -60,7 +60,8 @@ export default class ChatSpace {
     try {
       const res = await get_messages(
         this.profile.room,
-        this.profile.user_email
+        this.profile.user_email,
+        this.profile.token
       );
       this.setup_messages(res);
       this.setup_actions();
@@ -92,7 +93,8 @@ export default class ChatSpace {
         this.profile.message.content,
         this.profile.user,
         this.profile.room,
-        this.profile.user_email
+        this.profile.user_email,
+        this.profile.token,
       );
     }
     messages_list.forEach((element) => {
@@ -403,7 +405,8 @@ export default class ChatSpace {
       content,
       this.profile.user,
       this.profile.room,
-      this.profile.user_email
+      this.profile.user_email,
+      this.profile.token
     );
   }
 

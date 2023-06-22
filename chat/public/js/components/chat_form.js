@@ -72,6 +72,7 @@ export default class ChatForm {
       email: $('#chat-email').val(),
       full_name: $('#chat-fullname').val(),
       message: $('#chat-message-area').val(),
+      token: localStorage.getItem('guest_token' || ''),
     };
     return result;
   }
@@ -100,6 +101,7 @@ export default class ChatForm {
         user_email: res.email,
         message: query_message,
         room_type: res.room_type,
+        token: res.token,
       };
 
       const chat_space = new ChatSpace({

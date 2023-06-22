@@ -96,6 +96,7 @@ frappe.Chat = class {
             is_admin: res.is_admin,
             user: res.user,
             user_email: res.user_email,
+            token: token,
           },
         });
       } else {

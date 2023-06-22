@@ -56,18 +56,19 @@ async function get_rooms(email) {
   return await res.message;
 }
 
-async function get_messages(room, email) {
+async function get_messages(room, email, token) {
   const res = await frappe.call({
     method: 'chat.api.message.get_all',
     args: {
       room: room,
       email: email,
+      token: token,
     },
   });
   return await res.message;
 }
 
-async function send_message(content, user, room, email) {
+async function send_message(content, user, room, email, token) {
   try {
     await frappe.call({
       method: 'chat.api.message.send',
@@ -76,6 +77,7 @@ async function send_message(content, user, room, email) {
         user: user,
         room: room,
         email: email,
+        token:token,
       },
     });
   } catch (error) {
@@ -111,13 +113,14 @@ async function mark_message_read(room) {
 }
 
 
-async function create_guest({ email, full_name, message }) {
+async function create_guest({ email, full_name, message, token }) {
   const res = await frappe.call({
     method: 'chat.api.user.get_guest_room',
     args: {
       email: email,
       full_name: full_name,
       message: message,
+      token: token,
     },
   });
   return await res.message;
